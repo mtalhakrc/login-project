@@ -12,11 +12,11 @@ import (
 
 func Login(ctx *context.AppCtx) error {
 	user := models.User{}
-	username := ctx.C.FormValue("username")
-	password := ctx.C.FormValue("password")
+	username := ctx.FormValue("username")
+	password := ctx.FormValue("password")
 	err := ctx.DB.Where("username = ? AND password = ? ", username, password).First(&user).Error
 	if err != nil {
-		err := ctx.C.Status(fiber.StatusForbidden).SendString("username or password does not correct")
+		err := ctx.Status(fiber.StatusForbidden).SendString("username or password does not correct")
 		if err != nil {
 			log.Fatalln("cant send message: ", err)
 		}
@@ -27,7 +27,7 @@ func Login(ctx *context.AppCtx) error {
 	if err != nil {
 		log.Println("cant create uuid:", err)
 	}
-	ctx.C.Cookie(&fiber.Cookie{
+	ctx.Cookie(&fiber.Cookie{
 		Name:    "Login-session",
 		Value:   id.String(),
 		Expires: time.Now().Add(time.Minute),
@@ -42,7 +42,7 @@ func Login(ctx *context.AppCtx) error {
 		log.Println("cant create user:", err)
 		return err
 	}
-	err = ctx.C.Redirect("/mainmenu", fiber.StatusSeeOther)
+	err = ctx.Redirect("/mainmenu", fiber.StatusSeeOther)
 	if err != nil {
 		log.Println(err)
 		return err

@@ -34,7 +34,7 @@ func Signup(ctx *context.AppCtx) error {
 	if err != nil {
 		log.Println("cant create uuid:", err)
 	}
-	ctx.C.Cookie(&fiber.Cookie{
+	ctx.Cookie(&fiber.Cookie{
 		Name:    "Login-session",
 		Value:   id.String(),
 		Expires: time.Now().Add(time.Minute),
@@ -49,7 +49,7 @@ func Signup(ctx *context.AppCtx) error {
 		log.Println("cant create user:", err)
 		return err
 	}
-	err = ctx.C.Redirect("/mainmenu", fiber.StatusSeeOther)
+	err = ctx.Redirect("/mainmenu", fiber.StatusSeeOther)
 	if err != nil {
 		log.Println(err)
 	}

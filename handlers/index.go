@@ -18,11 +18,11 @@ func init() {
 }
 
 func Logout(ctx *context.AppCtx) error {
-	ctx.C.Cookie(&fiber.Cookie{
+	ctx.Cookie(&fiber.Cookie{
 		Name:    "Login-session",
 		Expires: time.Now().Add(time.Millisecond),
 	})
-	err := ctx.C.Redirect("/login", fiber.StatusSeeOther)
+	err := ctx.Redirect("/login", fiber.StatusSeeOther)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -36,8 +36,8 @@ func Index(ctx *context.AppCtx) error {
 		log.Println(err)
 		return err
 	}
-	ctx.C.Set("Content-Type", "text/html")
-	err = tmp.ExecuteTemplate(ctx.C, "index.gohtml", user)
+	ctx.Set("Content-Type", "text/html")
+	err = tmp.ExecuteTemplate(ctx, "index.gohtml", user)
 	if err != nil {
 		log.Fatalln("cant execute template:", err)
 	}
@@ -49,7 +49,7 @@ func UserJSON(ctx *context.AppCtx) error {
 		log.Println(err)
 		return err
 	}
-	err = ctx.C.JSON(&user)
+	err = ctx.JSON(&user)
 	if err != nil {
 		log.Println(err)
 		return err

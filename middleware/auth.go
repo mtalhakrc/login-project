@@ -13,19 +13,18 @@ type Sessions struct {
 
 //New middlewaresi, cookie yok ise logine geri döndürür.
 func Session(ctx *context.AppCtx) error {
-	cookievalue := ctx.C.Cookies("Login-session")
+	cookievalue := ctx.Ctx.Cookies("Login-session")
 	if cookievalue == "" {
-		return ctx.C.Status(fiber.StatusUnauthorized).Redirect("/login")
+		return ctx.Status(fiber.StatusUnauthorized).Redirect("/login")
 	}
-
 	//cookiedeki useri sor varsa dön yoksa devam et kayıt oluştur. contexte yaz
 	user := Sessions{}
 	err := ctx.DB.Model(&Sessions{}).Where("sess_id = ?", cookievalue).First(&user).Error
 	if err != nil {
-		return ctx.C.Status(fiber.StatusUnauthorized).Redirect("/login")
+		return ctx.Status(fiber.StatusUnauthorized).Redirect("/login")
 	}
-	ctx.C.Locals(user.Sess_id, user.User_id)
-	return ctx.C.Next()
+	ctx.Locals(user.Sess_id, user.User_id)
+	return ctx.Next()
 }
 
 //In short, PostgreSQL error 42601 occurs due to the syntax errors in the code.

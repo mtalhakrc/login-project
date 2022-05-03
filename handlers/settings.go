@@ -23,7 +23,7 @@ func Settings(ctx *context.AppCtx) error {
 	//check is username is alrady taken?
 	err = utils.IsAlreadyTaken(ctx, updatedUser)
 	if err == nil {
-		err = ctx.C.Status(fiber.StatusBadRequest).SendString("username is already taken!")
+		err = ctx.Status(fiber.StatusBadRequest).SendString("username is already taken!")
 		if err != nil {
 			log.Println("cant send message:", err)
 			return err
@@ -38,7 +38,7 @@ func Settings(ctx *context.AppCtx) error {
 	}
 	fmt.Println("user is updated:", updatedUser)
 	//go back mainmenu
-	err = ctx.C.Redirect("/mainmenu", fiber.StatusSeeOther)
+	err = ctx.Redirect("/mainmenu", fiber.StatusSeeOther)
 	if err != nil {
 		log.Println(err)
 	}
