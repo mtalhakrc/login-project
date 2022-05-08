@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"LoginProject/context"
-	"LoginProject/middleware"
+	"LoginProject/models"
 	"LoginProject/utils"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
@@ -12,22 +12,18 @@ import (
 )
 
 func Signup(ctx *context.AppCtx) error {
-	user, err := utils.FormValue(ctx)
-	if err != nil {
-		log.Println("cant form value:", err)
-	}
+	user := utils.FormValue(ctx)
 	//is username already taken?
-	err = utils.IsAlreadyTaken(ctx, user)
+	err := utils.IsAlreadyTaken(ctx, user)
 	if err == nil {
 		fmt.Println(err)
 		return err
 	}
 	//create a record
-	err = ctx.DB.Model(&user).Create(&user).Error
+	err = ctx.DB.Create(&user).Error
 	if err != nil {
 		log.Fatalln("cant create user:", err)
 	}
-	err = ctx.DB.Model(&user).Where("username = ?", user.Username).First(&user).Error
 
 	//set cookie
 	id, err := uuid.NewV4()
@@ -40,11 +36,11 @@ func Signup(ctx *context.AppCtx) error {
 		Expires: time.Now().Add(time.Minute),
 	})
 	//cookie valuesini ve user idsini sessions tablesine kaydet.
-	session := middleware.Sessions{
-		Sess_id: id.String(),
-		User_id: user.Id,
+	session := models.Sessions{
+		SessionId: id.String(),
+		UserId:    user.Id,
 	}
-	err = ctx.DB.Model(&session).Create(&session).Error
+	err = ctx.DB.Model(&models.Sessions{}).Create(&session).Error
 	if err != nil {
 		log.Println("cant create user:", err)
 		return err

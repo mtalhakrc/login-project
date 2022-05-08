@@ -13,8 +13,5 @@ func main() {
 	database.InitializeDB()
 	utils.SendStaticFiles(app)
 	router.SetupRoutes(app)
-	err := app.Listen("localhost:8080")
-	if err != nil {
-		log.Fatalln(err)
-	}
+	log.Fatalln(app.Listen("localhost:8080"))
 }

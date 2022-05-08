@@ -21,5 +21,5 @@ func InitializeDB() {
 	if err != nil {
 		log.Fatalln("cant connect to database", err)
 	}
-	fmt.Println("connected to the databas")
+	fmt.Println("connected to the database")
 }

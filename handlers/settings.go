@@ -10,11 +10,7 @@ import (
 
 func Settings(ctx *context.AppCtx) error {
 	//form the value
-	updatedUser, err := utils.FormValue(ctx)
-	if err != nil {
-		log.Println("cant form value:", err)
-		return err
-	}
+	updatedUser := utils.FormValue(ctx)
 	gonnaUpdate, err := utils.QuerybyUserid(ctx)
 	if err != nil {
 		log.Println(err)

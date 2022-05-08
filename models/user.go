@@ -1,9 +1,22 @@
 package models
 
 type User struct {
-	Id       int    `gorm:"primaryKey" json:"id"`
-	Username string `json:"username" json:"username"`
-	Password string `json:"password" json:"password"`
-	State    string `json:"state" json:"state"`
-	Age      int    `json:"age" json:"age"`
+	Id        int    `json:"id" gorm:"primaryKey"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	UsersInfo UsersInfo
+	Sessions  Sessions
+}
+
+type UsersInfo struct {
+	Id        int    `gorm:"primaryKey" json:"id"`
+	UserId    int    `json:"userId" gorm:"foreignKey"`
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
+}
+
+type Sessions struct {
+	Id        int    `gorm:"primaryKey"`
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId" gorm:"foreignKey"`
 }

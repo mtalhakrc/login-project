@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"LoginProject/context"
-	"LoginProject/middleware"
 	"LoginProject/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofrs/uuid"
@@ -33,19 +32,14 @@ func Login(ctx *context.AppCtx) error {
 		Expires: time.Now().Add(time.Minute),
 	})
 	//cookie valuesini ve user idsini sessions tablesine kaydet.
-	session := middleware.Sessions{
-		Sess_id: id.String(),
-		User_id: user.Id,
+	session := models.Sessions{
+		SessionId: id.String(),
+		UserId:    user.Id,
 	}
-	err = ctx.DB.Model(&session).Create(&session).Error
+	err = ctx.DB.Model(&models.Sessions{}).Create(&session).Error
 	if err != nil {
 		log.Println("cant create user:", err)
 		return err
 	}
-	err = ctx.Redirect("/mainmenu", fiber.StatusSeeOther)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	return err
+	return ctx.Redirect("/mainmenu", fiber.StatusSeeOther)
 }

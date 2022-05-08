@@ -6,30 +6,20 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"log"
-	"strconv"
 )
-
-var err error
 
 func SendStaticFiles(app *fiber.App) {
 	app.Static("/login", "./staticFiles/login.html")
 	app.Static("/signup", "./staticFiles/signup.html")
 	app.Static("/mainmenu/settings", "./staticFiles/settings.html")
 }
-func FormValue(ctx *context.AppCtx) (models.User, error) {
-	//get handlers information
-	//user := User{}
-	var user models.User
+func FormValue(ctx *context.AppCtx) models.User {
+	user := models.User{}
 	user.Username = ctx.FormValue("username")
 	user.Password = ctx.FormValue("password")
-	user.State = ctx.FormValue("state")
-	age, err := strconv.Atoi(ctx.FormValue("age"))
-	if err != nil {
-		log.Println("cant convert:", err)
-		return user, err
-	}
-	user.Age = age
-	return user, err
+	user.UsersInfo.Firstname = ctx.FormValue("firstname")
+	user.UsersInfo.Lastname = ctx.FormValue("lastname")
+	return user
 }
 
 func IsAlreadyTaken(ctx *context.AppCtx, user models.User) error {
@@ -42,12 +32,12 @@ func IsAlreadyTaken(ctx *context.AppCtx, user models.User) error {
 }
 
 func QuerybyUserid(ctx *context.AppCtx) (models.User, error) {
-	sessionId := ctx.Cookies("Login-session")
 	user := models.User{}
-	//get user values by querying user id
-	err = ctx.DB.Model(&user).Where("id = ?", ctx.Locals(sessionId)).First(&user).Error
+	sessionId := ctx.Cookies("Login-session")
+	//err := ctx.DB.Model(&models.User{}).Where("id = ?", ctx.Locals(sessionId)).First(&user).Error
+	err := ctx.DB.Preload("UsersInfo").Where("id = ?", ctx.Locals(sessionId)).First(&user).Error
 	if err != nil {
-		return user, err
+		log.Println(err)
 	}
 	return user, err
 }
