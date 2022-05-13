@@ -8,15 +8,15 @@ import (
 
 //New middlewaresi, cookie yok ise logine geri döndürür.
 func Session(ctx *context.AppCtx) error {
-	cookievalue := ctx.Cookies("Login-session")
-	if cookievalue == "" {
-		return ctx.Status(fiber.StatusUnauthorized).Redirect("/login")
+	cookieValue := ctx.Cookies("Login-session")
+	if cookieValue == "" {
+		return ctx.Status(fiber.StatusForbidden).SendString("user has no auth")
 	}
 	//cookiedeki useri sor varsa dön yoksa devam et kayıt oluştur. contexte yaz
 	user := models.Sessions{}
-	err := ctx.DB.Model(&models.Sessions{}).Where("session_id = ?", cookievalue).First(&user).Error
+	err := ctx.DB.Model(&models.Sessions{}).Where("session_id = ?", cookieValue).First(&user).Error
 	if err != nil {
-		return ctx.Status(fiber.StatusUnauthorized).Redirect("/login")
+		return ctx.Status(fiber.StatusForbidden).SendString("username or password not correct")
 	}
 	ctx.Locals(user.SessionId, user.UserId)
 	return ctx.Next()

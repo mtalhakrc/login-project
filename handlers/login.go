@@ -3,6 +3,7 @@ package handlers
 import (
 	"LoginProject/context"
 	"LoginProject/models"
+	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofrs/uuid"
 	"log"
@@ -11,15 +12,13 @@ import (
 
 func Login(ctx *context.AppCtx) error {
 	user := models.User{}
-	username := ctx.FormValue("username")
-	password := ctx.FormValue("password")
-	err := ctx.DB.Where("username = ? AND password = ? ", username, password).First(&user).Error
+	err := json.Unmarshal(ctx.Body(), &user)
 	if err != nil {
-		err := ctx.Status(fiber.StatusForbidden).SendString("username or password does not correct")
-		if err != nil {
-			log.Fatalln("cant send message: ", err)
-		}
-		return err
+		log.Println("cant decode the body:", err)
+	}
+	err = ctx.DB.Where("username = ? AND password = ? ", user.Username, user.Password).First(&user).Error
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).SendString("username or password not correct")
 	}
 	//set cookie
 	id, err := uuid.NewV4()
@@ -29,7 +28,7 @@ func Login(ctx *context.AppCtx) error {
 	ctx.Cookie(&fiber.Cookie{
 		Name:    "Login-session",
 		Value:   id.String(),
-		Expires: time.Now().Add(time.Minute),
+		Expires: time.Now().Add(time.Hour),
 	})
 	//cookie valuesini ve user idsini sessions tablesine kaydet.
 	session := models.Sessions{
@@ -41,5 +40,5 @@ func Login(ctx *context.AppCtx) error {
 		log.Println("cant create user:", err)
 		return err
 	}
-	return ctx.Redirect("/mainmenu", fiber.StatusSeeOther)
+	return ctx.JSON("succesfull!")
 }

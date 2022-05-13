@@ -4,21 +4,30 @@ import (
 	"LoginProject/context"
 	"LoginProject/models"
 	"LoginProject/utils"
+	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofrs/uuid"
+	uuid "github.com/satori/go.uuid"
 	"log"
 	"time"
 )
 
 func Signup(ctx *context.AppCtx) error {
-	user := utils.FormValue(ctx)
-	//is username already taken?
-	err := utils.IsAlreadyTaken(ctx, user)
-	if err == nil {
-		fmt.Println(err)
-		return err
+	user := models.User{}
+	err := json.Unmarshal(ctx.Body(), &user)
+	err = json.Unmarshal(ctx.Body(), &user.UsersInfo)
+	if err != nil {
+		log.Println("cant decode the body:", err)
 	}
+	fmt.Println(user)
+
+	//is username already taken?
+	err = utils.IsAlreadyTaken(ctx, user)
+	if err == nil {
+		fmt.Println("çalıştı!")
+		return ctx.Status(fiber.StatusForbidden).SendString("username is already taken!")
+	}
+
 	//create a record
 	err = ctx.DB.Create(&user).Error
 	if err != nil {
@@ -26,28 +35,17 @@ func Signup(ctx *context.AppCtx) error {
 	}
 
 	//set cookie
-	id, err := uuid.NewV4()
-	if err != nil {
-		log.Println("cant create uuid:", err)
-	}
+	id := uuid.NewV4()
 	ctx.Cookie(&fiber.Cookie{
 		Name:    "Login-session",
 		Value:   id.String(),
 		Expires: time.Now().Add(time.Minute),
 	})
+
 	//cookie valuesini ve user idsini sessions tablesine kaydet.
 	session := models.Sessions{
 		SessionId: id.String(),
 		UserId:    user.Id,
 	}
-	err = ctx.DB.Model(&models.Sessions{}).Create(&session).Error
-	if err != nil {
-		log.Println("cant create user:", err)
-		return err
-	}
-	err = ctx.Redirect("/mainmenu", fiber.StatusSeeOther)
-	if err != nil {
-		log.Println(err)
-	}
-	return err
+	return ctx.DB.Model(&models.Sessions{}).Create(&session).Error
 }

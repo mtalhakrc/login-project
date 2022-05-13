@@ -5,16 +5,17 @@ import (
 	"LoginProject/utils"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"html/template"
 	"log"
 	"time"
 )
 
-var tmp *template.Template
+//var tmp *template.Template
 
-func init() {
-	tmp = template.Must(template.ParseGlob("./templates/*"))
-	fmt.Println("parsed!")
+type deneme struct {
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
 }
 
 func Index(ctx *context.AppCtx) error {
@@ -23,15 +24,21 @@ func Index(ctx *context.AppCtx) error {
 		log.Println(err)
 		return err
 	}
-	ctx.Set("Content-Type", "text/html")
-	return tmp.ExecuteTemplate(ctx, "index.gohtml", user)
+	gonderilecek := deneme{
+		Username:  user.Username,
+		Password:  user.Password,
+		Firstname: user.UsersInfo.Firstname,
+		Lastname:  user.UsersInfo.Lastname,
+	}
+	fmt.Println(gonderilecek)
+	return ctx.JSON(gonderilecek)
 }
 func Logout(ctx *context.AppCtx) error {
 	ctx.Cookie(&fiber.Cookie{
 		Name:    "Login-session",
 		Expires: time.Now().Add(time.Millisecond),
 	})
-	return ctx.Redirect("/login", fiber.StatusSeeOther)
+	return nil
 }
 
 func UserJSON(ctx *context.AppCtx) error {

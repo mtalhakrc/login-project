@@ -5,7 +5,6 @@ type User struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	UsersInfo UsersInfo
-	Sessions  Sessions
 }
 
 type UsersInfo struct {
