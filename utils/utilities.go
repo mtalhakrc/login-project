@@ -3,7 +3,12 @@ package utils
 import (
 	"LoginProject/context"
 	"LoginProject/models"
+	"github.com/gofiber/fiber/v2"
 )
+
+func SendStaticFiles(app *fiber.App) {
+	app.Static("/", "./client/dist")
+}
 
 func IsAlreadyTaken(ctx *context.AppCtx, user models.User) error {
 	return ctx.DB.Model(&user).Where("username = ?", user.Username).First(&user).Error

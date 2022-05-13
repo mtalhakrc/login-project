@@ -3,6 +3,7 @@ package main
 import (
 	"LoginProject/database"
 	"LoginProject/router"
+	"LoginProject/utils"
 	"github.com/gofiber/fiber/v2"
 	"log"
 )
@@ -10,8 +11,8 @@ import (
 func main() {
 	app := fiber.New()
 	database.InitializeDB()
-	//utils.SendStaticFiles(app)
+	utils.SendStaticFiles(app)
 	router.SetupRoutes(app)
 
-	log.Fatalln(app.Listen("localhost:8081"))
+	log.Fatalln(app.Listen("localhost:8080"))
 }
